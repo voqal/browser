@@ -1,0 +1,29 @@
+name: Download Release
+
+# Controls when the workflow will run
+on: push
+
+jobs:
+
+  
+  get_asset:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: List Releases
+        run: gh release list --repo bfergerson/joinem
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+      - name: Fetch asset
+        run: gh release download --repo bfergerson/joinem master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+      - name: See what we downloaded
+        run: ls
+
+      - name: Inspect content
+        run: cat hello.txt

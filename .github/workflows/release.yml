@@ -1,0 +1,45 @@
+name: Release Browser
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  get_asset:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: List Releases
+        run: gh release list --repo voqal/browser-dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+      - name: Fetch Latest Release Tag
+        run: |
+          LATEST_RELEASE=$(gh release list --repo voqal/browser-dev --limit 1 --json tagName --jq '.[0].tagName')
+          echo "LATEST_RELEASE=$LATEST_RELEASE" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+      - name: Fetch Latest Release Asset
+        run: gh release download --repo voqal/browser-dev ${{ env.LATEST_RELEASE }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+      - name: List Downloaded Files
+        run: ls
+
+      - name: Upload Downloaded Assets as New Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dmg_file=$(ls *.dmg)
+          msi_file=$(ls *.msi)
+          deb_file=$(ls *.deb)
+          gh release create "${{ github.ref_name }}" "$dmg_file" "$msi_file" "$deb_file" -t "${{ github.ref_name }}" --draft --generate-notes
+

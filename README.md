@@ -11,4 +11,5 @@ allowing you to customize your experience and control your data.
 
 ## Demonstration
 
-https://github.com/user-attachments/assets/e8fd991a-5f81-4453-b351-a227714feb99
+https://github.com/user-attachments/assets/69427c21-eec2-4236-94ce-a610dc1b09de
+

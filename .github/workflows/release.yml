@@ -38,8 +38,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          dmg_file=$(ls *.dmg)
-          msi_file=$(ls *.msi)
-          deb_file=$(ls *.deb)
-          gh release create "${{ github.ref_name }}" "$dmg_file" "$msi_file" "$deb_file" -t "${{ github.ref_name }}" --draft --generate-notes
+          dmg_files=$(ls *.dmg 2>/dev/null || echo "")
+          msi_file=$(ls *.msi 2>/dev/null || echo "")
+          deb_file=$(ls *.deb 2>/dev/null || echo "")
 
+          # Check if the files exist before proceeding
+          if [[ -z "$dmg_files" ]]; then
+            echo "No .dmg files found."
+            exit 1
+          fi
+
+          if [[ -z "$msi_file" ]]; then
+            echo "No .msi file found."
+            exit 1
+          fi
+
+          if [[ -z "$deb_file" ]]; then
+            echo "No .deb file found."
+            exit 1
+          fi
+
+          gh release create "${{ github.ref_name }}" $dmg_files "$msi_file" "$deb_file" \
+            -t "${{ github.ref_name }}" --draft --generate-notes

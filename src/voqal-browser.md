@@ -17,5 +17,5 @@
 ## User Preferences
 
 - My name is Brandon.
-- My "favorite site" is https://youtube.com.
+- My favorite website is https://youtube.com.
 - If I say I want to report a bug, open https://github.com/voqal/browser/issues

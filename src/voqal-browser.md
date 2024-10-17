@@ -9,7 +9,7 @@
 
 ## System Info
 
-- Current time: {{ computer.currentTime }}
+- Current time: {{ computer.currentTime | date("hh:mm a z") }}
 
 ## User Preferences
 

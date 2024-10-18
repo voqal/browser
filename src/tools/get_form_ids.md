@@ -3,7 +3,7 @@ type: function
 function:
   name: get_form_ids
   description: Returns a list of the form ids on the current page. Useful as a precursor to input_form.
-  exec: kotlin
+  exec: javascript
 ```
 
 ```javascript

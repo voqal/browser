@@ -58,5 +58,5 @@ jobs:
             exit 1
           fi
 
-          gh release create "${{ github.ref_name }}" $dmg_files "$msi_file" "$deb_file" \
-            -t "${{ github.ref_name }}" --draft --generate-notes
+          gh release create "${{ env.LATEST_RELEASE }}" $dmg_files "$msi_file" "$deb_file" \
+            -t "${{ env.LATEST_RELEASE }}" --draft --generate-notes

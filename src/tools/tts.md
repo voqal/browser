@@ -11,9 +11,22 @@ function:
         description: The text to speak
     required:
       - text
-  exec: kotlin
+  exec:
+    language: kotlin
+    preload: true
 ```
 
 ```kotlin
-log.info("{{ text }}")
+var savedText = ""
+
+contextManager.registerContextListener {
+    val text = it.context["text"] as String
+    val newText = text.substring(savedText.length)
+    savedText = text
+
+    log.addSpeech(newText, it.final)
+    if (it.final) {
+        savedText = ""
+    }
+}
 ```

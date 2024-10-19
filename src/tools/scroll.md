@@ -1,7 +1,5 @@
 ## scroll
 
-### Schema
-
 ```yaml
 type: function
 function:
@@ -32,8 +30,6 @@ function:
   description: Scroll the browser
   exec: javascript
 ```
-
-### Implementation
 
 ```javascript
 let scrollDirection = '{{ scrollDirection }}';

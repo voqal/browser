@@ -1,7 +1,3 @@
-## load_url
-
-### Schema
-
 ```yaml
 type: function
 function:
@@ -17,8 +13,6 @@ function:
   description: Open the specified URL in the browser
   exec: kotlin
 ```
-
-### Implementation
 
 ```kotlin
 browser.loadURL("{{ url }}")

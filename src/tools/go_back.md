@@ -7,5 +7,6 @@ function:
 ```
 
 ```kotlin
+log.debug("canGoBack: " + browser.canGoBack())
 browser.goBack()
 ```

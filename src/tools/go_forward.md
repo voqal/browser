@@ -7,6 +7,6 @@ function:
 ```
 
 ```kotlin
-println("canGoForward: " + browser.canGoForward())
+log.debug("canGoForward: " + browser.canGoForward())
 browser.goForward()
 ```

@@ -1,5 +1,3 @@
-## scroll
-
 ```yaml
 type: function
 function:

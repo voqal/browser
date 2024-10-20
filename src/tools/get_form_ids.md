@@ -3,7 +3,9 @@ type: function
 function:
   name: get_form_ids
   description: Returns a list of the form ids on the current page. Useful as a precursor to input_form.
-  exec: javascript
+  exec:
+    language: javascript
+    manual_confirm: true
 ```
 
 ```javascript
@@ -39,7 +41,6 @@ function getElementDescription(el) {
 
     return label;
 }
-
 
 const resp = {
     respId: "{{ voqal_resp_id }}",

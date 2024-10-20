@@ -15,5 +15,5 @@ function:
 ```
 
 ```kotlin
-browser.loadURL("{{ url }}")
+browser.loadURL(url)
 ```

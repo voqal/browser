@@ -2,41 +2,87 @@
 type: function
 function:
   name: input_form
-  description: Types the given text in the form of the given form id.
+  description: Types the given text in the forms based on the provided form IDs and texts.
   parameters:
     type: object
     properties:
-      form_id:
-        type: string
-        description: The form id to type text into
-      text:
-        type: string
-        description: The text to type
+      inputs:
+        type: array
+        description: A list of form inputs, each containing a form ID and the corresponding text to type.
+        items:
+          type: object
+          properties:
+            form_id:
+              type: string
+              description: The form ID to type text into.
+            text:
+              type: string
+              description: The text to type into the form.
+          required:
+            - form_id
+            - text
     required:
-      - form_id
-      - text
-  exec: javascript
+      - inputs
+  exec:
+    language: javascript
+    manual_confirm: true
+    trigger_response: true
+    execute_on_all_frames: true
 ```
 
 ```javascript
-const element = getTypableElementById("{{ form_id }}");
-if (element) {
-    element.value = "{{ text }}";
-} else {
-    alert('Element with id ' + "{{ form_id }}" + ' not found.');
+const inputsArray = {{ context }}.inputs;
+for (const input of inputsArray) {
+    const element = getTypableElementById(input.form_id);
+    if (element) {
+        scrollToElement(element);
+
+        element.value = "";
+        typeText(element, input.text);
+    } else {
+        console.log('Element with id ' + input.form_id + ' not found.');
+    }
 }
 
-function getTypableElementById(id) {
-    // Get all elements with the specified ID
-    const elements = document.querySelectorAll(`#${id}`);
+const resp = {
+    respId: "{{ voqal_resp_id }}",
+    data: [{
+        status: "success",
+    }]
+}
+window.cefQuery({
+    request: JSON.stringify(resp),
+    onSuccess: function (response) {
+        resolve(response);
+    }
+});
 
-    // Iterate through the NodeList and return the first typable element
+function getTypableElementById(id) {
+    const elements = document.querySelectorAll(`#${id}`);
     for (let element of elements) {
         if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
-            return element; // Return the first typable element found
+            return element;
         }
     }
+    return null;
+}
 
-    return null; // Return null if no typable element is found
+function scrollToElement(element) {
+    element.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+
+function typeText(element, text, delay = 20) {
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+        element.value += text[currentIndex];
+        currentIndex++;
+        if (currentIndex === text.length) {
+            clearInterval(interval);
+            element.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+    }, delay);
 }
 ```

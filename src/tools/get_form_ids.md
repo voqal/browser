@@ -2,44 +2,64 @@
 type: function
 function:
   name: get_form_ids
-  description: Returns a list of the form ids on the current page. Useful as a precursor to input_form.
+  description: Returns a list of the form ids on the current page. Useful as a precursor to input_form/click_button.
   exec:
     language: javascript
     manual_confirm: true
+    execute_on_all_frames: true
 ```
 
 ```javascript
 function getInputDescriptions() {
-    const elementDescriptionPairs = [];
-
-    document.querySelectorAll('input, textarea').forEach(element => {
-        const type = element.type || 'unknown';
-        if (type === 'submit' || type === 'button' || type === 'hidden') {
-            return;
-        }
-
+    const elementDescriptions = [];
+    document.querySelectorAll('input, textarea, button').forEach(element => {
         const description = getElementDescription(element);
         if (description == null) {
             return;
         }
-
-        elementDescriptionPairs.push({element, description, id: element.id});
+        elementDescriptions.push({description});
     });
 
-    return elementDescriptionPairs;
+    return elementDescriptions;
 }
 
 function getElementDescription(el) {
-    let label = document.querySelector(`label[for="${el.id}"]`);
+    const type = el.type || 'unknown';
+    let description = {
+        type: type,
+        label: '',
+        elementId: getId(el),
+        elementName: el.name || '',
+        type: type,
+        label: '',
+        elementName: el.name || '',
+        innerText: el.innerText || '',
+        hidden: el.hidden,
+        visible: el.offsetParent !== null,
+        position: getPosition(el)
+    };
+
+    const label = document.querySelector(`label[for="${el.id}"]`);
     if (label) {
-        label = label.textContent.trim();
+        description.label = label.textContent.trim();
     }
     const ariaLabel = el.getAttribute('aria-label');
     if (ariaLabel) {
-        label = ariaLabel;
+        description.label = ariaLabel;
     }
 
-    return label;
+    return description;
+}
+
+function getId(node) {
+    return (node.id) ? node.id : (node.id = 'voqal_' + crypto.randomUUID());
+}
+
+function getPosition(el) {
+    const rect = el.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    return {x, y};
 }
 
 const resp = {

@@ -1,0 +1,100 @@
+<html>
+<script>
+    console.log("Sandbox loaded. Time: " + new Date().getTime());
+    var innerHTMLCache = {}; //html,hash
+
+    function applyDiff(oldHtml, diff) {
+        let result = '';
+        let lastIndex = 0;
+
+        diff.forEach(({ start, oldContent, newContent }) => {
+            // Append unchanged content
+            result += oldHtml.slice(lastIndex, start);
+            // Replace with new content
+            result += newContent;
+            // Update the last processed index
+            lastIndex = start + oldContent.length;
+        });
+
+        // Append remaining unchanged content
+        result += oldHtml.slice(lastIndex);
+
+        return result;
+    }
+
+    function simpleHash(input) {
+        let hash = 0;
+        for (let i = 0; i < input.length; i++) {
+            const char = input.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0;
+        }
+        return hash;
+    }
+
+    window.addEventListener('message', async function (event) {
+        //console.log("Got action. Time: " + new Date().getTime());
+        const startTime = new Date().getTime();
+        const toSandboxDuration = startTime - event.data.sentAt;
+        let html = innerHTMLCache.html;
+        if (event.data.html) {
+            html = event.data.html;
+            innerHTMLCache = {html: html, hash: event.data.hash};
+            //console.log("Using new HTML. Hash: " + event.data.hash);
+        } else if (event.data.diff) {
+            const existingHash = innerHTMLCache.hash;
+            //console.log("Existing hash: " + existingHash + " - Received hash: " + event.data.hash);
+            if (existingHash !== event.data.hash) {
+                try {
+                    html = applyDiff(html, event.data.diff);
+                    innerHTMLCache = {html: html, hash: event.data.hash};
+                    //console.log("Using diff");
+                } catch (e) {
+                    console.error(e);
+                }
+                //console.log("received hash: " + simpleHash(html));
+            } else {
+                //console.log("Hashes match. Using cache");
+            }
+        }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        //console.log("Parsed HTML. Time: " + new Date().getTime());
+
+        const code = event.data.code
+        //replace document. with doc.
+        let codeWithDoc = code.replace(/document\./g, 'doc.');
+
+        //replace [[action]] with action
+        if (event.data.action) {
+            //console.log("Replacing [[action]] with " + event.data.action);
+            codeWithDoc = codeWithDoc.replace(/\[\[action\]\]/g, event.data.action);
+        } else {
+            //console.log("No action to replace");
+            codeWithDoc = codeWithDoc.replace(/\[\[action\]\]/g, '');
+        }
+
+        let evalResult;
+        try {
+            evalResult = eval(codeWithDoc);
+        } catch (e) {
+            evalResult = e;
+        }
+        const endTime = new Date().getTime();
+        //console.log("Executed code. Duration: " + (endTime - startTime) + "ms - Result: " + JSON.stringify(evalResult));
+
+        const execResult = {
+            debug: {
+                evalDuration: endTime - startTime,
+                toSandboxDuration: toSandboxDuration
+            },
+            result: evalResult,
+            voqal_resp_id: event.data.voqal_resp_id
+        }
+
+        //console.log("Executed code. Time: " + new Date().getTime());
+        event.source.window.postMessage(execResult, event.origin);
+    });
+</script>
+</html>

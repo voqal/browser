@@ -207,6 +207,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     debug: event.debug
                 });
                 handlers.delete(event.voqal_resp_id);
+            } else if (data.action === 'update_window') {
+                //split variable_name by '.' and set the value
+                const variableNameParts = data.variable_name.split('.');
+                let variable = window;
+                for (let i = 0; i < variableNameParts.length - 1; i++) {
+                    variable = variable[variableNameParts[i]];
+                }
+                variable[variableNameParts[variableNameParts.length - 1]] = data.variable_value;
+                sendResponse({
+                    result: data,
+                    debug: event.debug
+                });
+                handlers.delete(event.voqal_resp_id);
             } else if (data.action === 'click') {
                 click(iframe, message);
                 sendResponse({

@@ -72,7 +72,7 @@ function applyDiff(oldHtml, diff) {
     let result = '';
     let lastIndex = 0;
 
-    diff.forEach(({ start, oldContent, newContent }) => {
+    diff.forEach(({start, oldContent, newContent}) => {
         // Append unchanged content
         result += oldHtml.slice(lastIndex, start);
         // Replace with new content
@@ -306,7 +306,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sentAt: Date.now()
         };
         const postDataJson = JSON.stringify(postData);
-        const size =  (postDataJson.length / 1024);
+        const size = (postDataJson.length / 1024);
         if (size > 10) {
             console.log("Post data size in kb: " + size + " - Hash: " + simpleHash(emailCache.html));
         }

@@ -114,7 +114,18 @@ function connect() {
         const data = JSON.parse(event.data);
         //console.log("Event type: ", data.type);
 
-        if (data.type === 'create_tab') {
+        if (data.type === 'open_url') {
+            const url = data.payload.url;
+            await chrome.tabs.update({url});
+
+            const resp = {
+                result: {
+                    status: 'success'
+                },
+                replyTo: data.replyTo
+            }
+            webSocket.send(JSON.stringify(resp));
+        } else if (data.type === 'create_tab') {
             console.log(JSON.stringify(data));
             const url = data.payload.url;
             await chrome.tabs.create({url});
